@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PresupIA — Presupuestos y Facturas fáciles</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#F97316;--orange-light:#FFF7ED;--orange-dark:#EA580C;
+  --green:#16A34A;--green-light:#F0FDF4;
+  --amber:#D97706;--amber-light:#FFFBEB;
+  --red:#DC2626;--red-light:#FEF2F2;
+  --blue:#2563EB;--blue-light:#EFF6FF;
+  --gray-50:#F9FAFB;--gray-100:#F3F4F6;--gray-200:#E5E7EB;
+  --gray-300:#D1D5DB;--gray-400:#9CA3AF;--gray-500:#6B7280;
+  --gray-600:#4B5563;--gray-700:#374151;--gray-800:#1F2937;--gray-900:#111827;
+  --radius:12px;--radius-sm:8px;--radius-xs:6px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 6px -1px rgba(0,0,0,.08),0 2px 4px -2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.08),0 4px 6px -4px rgba(0,0,0,.04);
+  --font:'DM Sans',sans-serif;--font-mono:'DM Mono',monospace;
+}
+body{font-family:var(--font);background:var(--gray-50);color:var(--gray-900);min-height:100vh;font-size:15px}
+.app{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:260px;background:#fff;border-right:1px solid var(--gray-200);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform .3s}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--gray-100)}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:var(--orange);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+.logo-text{font-size:18px;font-weight:600;color:var(--gray-900)}
+.logo-text span{color:var(--orange)}
+.logo-sub{font-size:11px;color:var(--gray-400);margin-top:2px}
+.nav{padding:16px 12px;flex:1}
+.nav-section-label{font-size:10.5px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.8px;padding:12px 8px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;color:var(--gray-600);cursor:pointer;transition:all .15s;border:none;background:none;width:100%;text-align:left;margin-bottom:2px}
+.nav-item:hover{background:var(--gray-50);color:var(--gray-900)}
+.nav-item.active{background:var(--orange-light);color:var(--orange-dark)}
+.nav-item i{font-size:19px;width:22px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;min-width:20px;text-align:center}
+.sidebar-footer{padding:16px 12px;border-top:1px solid var(--gray-100)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--gray-50)}
+.user-avatar{width:34px;height:34px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:600;flex-shrink:0}
+.user-name{font-size:13px;font-weight:600;color:var(--gray-800)}
+.user-role{font-size:11px;color:var(--gray-400)}
+
+/* MAIN */
+.main{margin-left:260px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid var(--gray-200);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-left h1{font-size:20px;font-weight:600;color:var(--gray-900)}
+.topbar-left p{font-size:13px;color:var(--gray-400);margin-top:1px}
+.topbar-right{display:flex;gap:10px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer;transition:all .15s;border:1px solid var(--gray-200);background:#fff;color:var(--gray-700)}
+.btn:hover{background:var(--gray-50);border-color:var(--gray-300)}
+.btn.primary{background:var(--orange);border-color:var(--orange);color:#fff;box-shadow:0 1px 2px rgba(249,115,22,.3)}
+.btn.primary:hover{background:var(--orange-dark);border-color:var(--orange-dark)}
+.btn.success{background:var(--green);border-color:var(--green);color:#fff}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn i{font-size:17px}
+.content{padding:28px;flex:1}
+
+/* CARDS KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.kpi-card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.kpi-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.kpi-label{font-size:13px;font-weight:500;color:var(--gray-500)}
+.kpi-icon{width:36px;height:36px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:18px}
+.kpi-value{font-size:28px;font-weight:600;color:var(--gray-900);line-height:1}
+.kpi-sub{font-size:12px;color:var(--gray-400);margin-top:4px}
+.kpi-sub.positive{color:var(--green)}
+
+/* TABLE */
+.card{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.card-header{padding:18px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:15px;font-weight:600;color:var(--gray-900)}
+.card-sub{font-size:12px;color:var(--gray-400);margin-top:2px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:11px 16px;font-size:11.5px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;background:var(--gray-50);border-bottom:1px solid var(--gray-100)}
+td{padding:13px 16px;font-size:14px;color:var(--gray-700);border-bottom:1px solid var(--gray-100)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--gray-50)}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%}
+.badge.pendiente{background:var(--amber-light);color:var(--amber)}.badge.pendiente::before{background:var(--amber)}
+.badge.aceptado{background:var(--green-light);color:var(--green)}.badge.aceptado::before{background:var(--green)}
+.badge.rechazado{background:var(--red-light);color:var(--red)}.badge.rechazado::before{background:var(--red)}
+.badge.cobrada{background:var(--green-light);color:var(--green)}.badge.cobrada::before{background:var(--green)}
+.badge.pendiente-pago{background:var(--amber-light);color:var(--amber)}.badge.pendiente-pago::before{background:var(--amber)}
+.mono{font-family:var(--font-mono);font-size:13px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow-lg);width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:17px;font-weight:600;color:var(--gray-900)}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--gray-100);display:flex;justify-content:flex-end;gap:10px}
+.form-group{margin-bottom:16px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-size:13px;font-weight:500;color:var(--gray-700);margin-bottom:6px}
+input,select,textarea{width:100%;padding:9px 12px;border:1px solid var(--gray-200);border-radius:var(--radius-xs);font-size:14px;font-family:var(--font);color:var(--gray-900);background:#fff;transition:border .15s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,.1)}
+textarea{resize:vertical;min-height:70px}
+.divider{height:1px;background:var(--gray-100);margin:20px 0}
+.lines-header{display:grid;grid-template-columns:1fr 80px 90px 90px 36px;gap:8px;margin-bottom:8px}
+.lines-header span{font-size:11.5px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.4px}
+.line-row{display:grid;grid-template-columns:1fr 80px 90px 90px 36px;gap:8px;margin-bottom:8px;align-items:center}
+.line-row input{padding:8px 10px;font-size:13px}
+.btn-icon{width:36px;height:36px;border-radius:var(--radius-xs);border:1px solid var(--gray-200);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gray-400);transition:all .15s;font-size:18px}
+.btn-icon:hover{background:var(--red-light);border-color:var(--red);color:var(--red)}
+.total-row{display:flex;justify-content:flex-end;gap:24px;margin-top:16px;padding:16px;background:var(--orange-light);border-radius:var(--radius-sm)}
+.total-item{text-align:right}
+.total-label{font-size:12px;color:var(--gray-500)}
+.total-value{font-size:16px;font-weight:600;color:var(--gray-900)}
+.total-value.big{font-size:22px;color:var(--orange-dark)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--gray-400)}
+.empty i{font-size:48px;margin-bottom:12px;opacity:.4}
+.empty p{font-size:15px;margin-bottom:16px}
+
+/* PDF PREVIEW */
+.pdf-preview{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:40px;max-width:700px;margin:0 auto;font-size:14px}
+.pdf-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px}
+.pdf-company{font-size:22px;font-weight:700;color:var(--orange)}
+.pdf-type{font-size:28px;font-weight:700;color:var(--gray-200);text-align:right;line-height:1}
+.pdf-num{font-size:14px;color:var(--gray-500);text-align:right}
+.pdf-parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px}
+.pdf-label{font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.pdf-value{font-size:14px;color:var(--gray-800);font-weight:500}
+.pdf-table{width:100%;border-collapse:collapse;margin-bottom:24px}
+.pdf-table th{text-align:left;padding:8px 12px;background:var(--gray-800);color:#fff;font-size:12px;font-weight:600}
+.pdf-table td{padding:10px 12px;border-bottom:1px solid var(--gray-100);font-size:13px}
+.pdf-totals{margin-left:auto;width:220px}
+.pdf-total-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px}
+.pdf-total-row.main{font-size:16px;font-weight:700;padding-top:12px;border-top:2px solid var(--gray-200)}
+.pdf-footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--gray-100);font-size:12px;color:var(--gray-400);text-align:center}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--gray-900);color:#fff;padding:12px 18px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;box-shadow:var(--shadow-lg);z-index:999;display:flex;align-items:center;gap:8px;transform:translateY(80px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--green)}
+.toast i{font-size:18px}
+
+/* MOBILE */
+.hamburger{display:none;background:none;border:none;font-size:24px;cursor:pointer;color:var(--gray-700);padding:4px}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hamburger{display:flex}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .topbar{padding:14px 16px}
+  .content{padding:16px}
+  table{font-size:13px}
+  th,td{padding:10px 12px}
+  .hide-mobile{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <div class="logo-icon"><i class="ti ti-file-invoice"></i></div>
+        <div>
+          <div class="logo-text">Presupl<span>A</span></div>
+          <div class="logo-sub">Presupuestos fáciles</div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section-label">Principal</div>
+      <button class="nav-item active" onclick="navigate('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</button>
+      <button class="nav-item" onclick="navigate('presupuestos',this)"><i class="ti ti-file-text"></i>Presupuestos <span class="nav-badge" id="badge-presup">0</span></button>
+      <button class="nav-item" onclick="navigate('facturas',this)"><i class="ti ti-receipt"></i>Facturas <span class="nav-badge" id="badge-fact" style="display:none">0</span></button>
+      <div class="nav-section-label">Acciones</div>
+      <button class="nav-item" onclick="openModal('presupuesto')"><i class="ti ti-plus"></i>Nuevo presupuesto</button>
+      <button class="nav-item" onclick="navigate('ayuda',this)"><i class="ti ti-help-circle"></i>Ayuda</button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card">
+        <div class="user-avatar">MA</div>
+        <div>
+          <div class="user-name">Miguel Alonso</div>
+          <div class="user-role">Fontanero autónomo</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="page-title">Dashboard</h1>
+        <p id="page-sub">Bienvenido, Miguel. Aquí tienes el resumen de hoy.</p>
+      </div>
+      <div class="topbar-right">
+        <button class="hamburger" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></button>
+        <button class="btn primary" onclick="openModal('presupuesto')"><i class="ti ti-plus"></i><span class="hide-mobile">Nuevo presupuesto</span></button>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+
+<!-- MODAL PRESUPUESTO -->
+<div class="modal-overlay" id="modal-presupuesto">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-presup-title">Nuevo presupuesto</div>
+      <button class="btn-icon" onclick="closeModal('presupuesto')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cliente *</label>
+          <input type="text" id="p-cliente" placeholder="Nombre del cliente">
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" id="p-telefono" placeholder="600 000 000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" id="p-direccion" placeholder="Calle, número, ciudad">
+        </div>
+        <div class="form-group">
+          <label>Válido hasta</label>
+          <input type="date" id="p-validez">
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <label style="margin:0;font-size:14px">Conceptos</label>
+        <button class="btn sm" onclick="addLine()"><i class="ti ti-plus"></i>Añadir línea</button>
+      </div>
+      <div class="lines-header">
+        <span>Descripción</span><span>Cant.</span><span>Precio</span><span>Total</span><span></span>
+      </div>
+      <div id="lines-container"></div>
+      <div class="total-row">
+        <div class="total-item"><div class="total-label">Base imponible</div><div class="total-value" id="t-base">€0,00</div></div>
+        <div class="total-item"><div class="total-label">IVA (21%)</div><div class="total-value" id="t-iva">€0,00</div></div>
+        <div class="total-item"><div class="total-label">TOTAL</div><div class="total-value big" id="t-total">€0,00</div></div>
+      </div>
+      <div class="form-group" style="margin-top:16px">
+        <label>Notas adicionales</label>
+        <textarea id="p-notas" placeholder="Condiciones, garantías, observaciones..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('presupuesto')">Cancelar</button>
+      <button class="btn primary" onclick="savePresupuesto()"><i class="ti ti-device-floppy"></i>Guardar presupuesto</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PDF -->
+<div class="modal-overlay" id="modal-pdf">
+  <div class="modal" style="max-width:740px">
+    <div class="modal-header">
+      <div class="modal-title">Vista previa</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn sm success" onclick="printPDF()"><i class="ti ti-printer"></i>Imprimir / PDF</button>
+        <button class="btn-icon" onclick="closeModal('pdf')"><i class="ti ti-x"></i></button>
+      </div>
+    </div>
+    <div class="modal-body" id="pdf-content" style="padding:20px"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check"></i><span id="toast-msg"></span></div>
+
+<script>
+// ---- DATA ----
+let presupuestos = [
+  {id:'P-2025-001',cliente:'Bar El Rincón',telefono:'654 321 987',direccion:'C/ Mayor 12, Madrid',fecha:'2025-05-01',validez:'2025-05-31',estado:'aceptado',notas:'Incluye materiales y mano de obra.',lines:[{desc:'Reparación tubería principal',qty:1,price:180},{desc:'Cambio grifo cocina',qty:2,price:45},{desc:'Materiales fontanería',qty:1,price:67}]},
+  {id:'P-2025-002',cliente:'Comunidad Virgen del Pilar',telefono:'91 234 56 78',direccion:'Avda. Constitución 5, Madrid',fecha:'2025-05-05',validez:'2025-06-05',estado:'pendiente',notas:'Presupuesto sujeto a revisión in situ.',lines:[{desc:'Revisión instalación general',qty:1,price:95},{desc:'Limpieza desagües',qty:3,price:40}]},
+  {id:'P-2025-003',cliente:'Familia Martínez',telefono:'666 111 222',direccion:'C/ Pinos 8, Alcalá',fecha:'2025-05-08',validez:'2025-05-25',estado:'rechazado',notas:'',lines:[{desc:'Instalación caldera nueva',qty:1,price:1200},{desc:'Mano de obra',qty:1,price:350}]},
+  {id:'P-2025-004',cliente:'Restaurante La Bodega',telefono:'91 876 54 32',direccion:'Pl. España 3, Madrid',fecha:'2025-05-10',validez:'2025-06-10',estado:'pendiente',notas:'Urgente. Cocina inoperativa.',lines:[{desc:'Reparación urgente gas',qty:1,price:220},{desc:'Sellado tuberías',qty:4,price:25}]},
+  {id:'P-2025-005',cliente:'Oficinas Central Tech',telefono:'91 555 00 11',direccion:'C/ Alcalá 200, Madrid',fecha:'2025-05-12',validez:'2025-06-12',estado:'aceptado',notas:'Trabajo en horario nocturno.',lines:[{desc:'Instalación sistema riego',qty:1,price:480},{desc:'Programación temporizadores',qty:1,price:120},{desc:'Materiales riego',qty:1,price:95}]},
+];
+
+let facturas = [
+  {id:'F-2025-001',presupId:'P-2025-001',cliente:'Bar El Rincón',fecha:'2025-05-03',estado:'cobrada',lines:[{desc:'Reparación tubería principal',qty:1,price:180},{desc:'Cambio grifo cocina',qty:2,price:45},{desc:'Materiales fontanería',qty:1,price:67}]},
+  {id:'F-2025-002',presupId:'P-2024-089',cliente:'Garaje Hermanos López',fecha:'2025-04-28',estado:'pendiente-pago',lines:[{desc:'Instalación nuevo baño',qty:1,price:850},{desc:'Sanitarios',qty:1,price:320}]},
+  {id:'F-2025-003',presupId:'P-2024-092',cliente:'Academia Idiomas Sol',fecha:'2025-04-15',estado:'cobrada',lines:[{desc:'Mantenimiento anual fontanería',qty:1,price:200}]},
+];
+
+let editingId = null;
+let lineCount = 0;
+
+// ---- NAVIGATION ----
+function navigate(page, el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const titles = {
+    dashboard: ['Dashboard', 'Bienvenido, Miguel. Aquí tienes el resumen de hoy.'],
+    presupuestos: ['Presupuestos', 'Gestiona y envía tus presupuestos'],
+    facturas: ['Facturas', 'Control de cobros y pagos'],
+    ayuda: ['Ayuda', '¿Tienes alguna duda?'],
+  };
+  const [t, s] = titles[page] || ['', ''];
+  document.getElementById('page-title').textContent = t;
+  document.getElementById('page-sub').textContent = s;
+  const c = document.getElementById('content');
+  if(page === 'dashboard') renderDashboard(c);
+  else if(page === 'presupuestos') renderPresupuestos(c);
+  else if(page === 'facturas') renderFacturas(c);
+  else if(page === 'ayuda') renderAyuda(c);
+  updateBadges();
+  closeSidebar();
+}
+
+function updateBadges() {
+  const pending = presupuestos.filter(p => p.estado === 'pendiente').length;
+  const unpaid = facturas.filter(f => f.estado === 'pendiente-pago').length;
+  const bp = document.getElementById('badge-presup');
+  const bf = document.getElementById('badge-fact');
+  if(pending > 0) { bp.textContent = pending; bp.style.display = ''; }
+  else bp.style.display = 'none';
+  if(unpaid > 0) { bf.textContent = unpaid; bf.style.display = ''; }
+  else bf.style.display = 'none';
+}
+
+// ---- DASHBOARD ----
+function renderDashboard(c) {
+  const totalPresup = presupuestos.length;
+  const pendiente = presupuestos.filter(p => p.estado === 'pendiente').length;
+  const calcTotal = items => items.reduce((a,l) => a + l.qty * l.price, 0);
+  const totalFacturado = facturas.reduce((a,f) => a + calcTotal(f.lines) * 1.21, 0);
+  const porCobrar = facturas.filter(f => f.estado === 'pendiente-pago').reduce((a,f) => a + calcTotal(f.lines) * 1.21, 0);
+
+  c.innerHTML = `
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Presupuestos este mes</span><div class="kpi-icon" style="background:#FFF7ED;color:var(--orange)"><i class="ti ti-file-text"></i></div></div>
+      <div class="kpi-value">${totalPresup}</div>
+      <div class="kpi-sub positive">↑ ${presupuestos.filter(p=>p.estado==='aceptado').length} aceptados</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Pendientes de respuesta</span><div class="kpi-icon" style="background:#FFFBEB;color:var(--amber)"><i class="ti ti-clock"></i></div></div>
+      <div class="kpi-value">${pendiente}</div>
+      <div class="kpi-sub">Esperando confirmación</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Facturado este mes</span><div class="kpi-icon" style="background:#F0FDF4;color:var(--green)"><i class="ti ti-currency-euro"></i></div></div>
+      <div class="kpi-value">€${totalFacturado.toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+      <div class="kpi-sub positive">↑ 3 facturas emitidas</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-header"><span class="kpi-label">Por cobrar</span><div class="kpi-icon" style="background:#FEF2F2;color:var(--red)"><i class="ti ti-wallet"></i></div></div>
+      <div class="kpi-value">€${porCobrar.toLocaleString('es-ES',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+      <div class="kpi-sub" style="color:var(--red)">Pendiente de cobro</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Últimos presupuestos</div><div class="card-sub">Actividad reciente</div></div>
+        <button class="btn sm" onclick="navigate('presupuestos',null)">Ver todos →</button>
+      </div>
+      <table>
+        <thead><tr><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead>
+        <tbody>${presupuestos.slice(0,4).map(p => {
+          const total = p.lines.reduce((a,l) => a + l.qty * l.price, 0) * 1.21;
+          return `<tr><td style="font-weight:500">${p.cliente}</td><td class="mono">€${total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td>${badge(p.estado)}</td></tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div><div class="card-title">Facturas pendientes</div><div class="card-sub">Reclamaciones necesarias</div></div>
+        <button class="btn sm" onclick="navigate('facturas',null)">Ver todas →</button>
+      </div>
+      <table>
+        <thead><tr><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead>
+        <tbody>${facturas.map(f => {
+          const total = f.lines.reduce((a,l) => a + l.qty * l.price, 0) * 1.21;
+          return `<tr><td style="font-weight:500">${f.cliente}</td><td class="mono">€${total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td>${badge(f.estado)}</td></tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ---- PRESUPUESTOS ----
+function renderPresupuestos(c) {
+  c.innerHTML = `
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Todos los presupuestos</div><div class="card-sub">${presupuestos.length} presupuestos en total</div></div>
+      <button class="btn primary" onclick="openModal('presupuesto')"><i class="ti ti-plus"></i>Nuevo</button>
+    </div>
+    <table>
+      <thead><tr><th>Número</th><th>Cliente</th><th class="hide-mobile">Fecha</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>${presupuestos.map(p => {
+        const total = p.lines.reduce((a,l) => a + l.qty * l.price, 0) * 1.21;
+        return `<tr>
+          <td class="mono">${p.id}</td>
+          <td><div style="font-weight:500">${p.cliente}</div><div style="font-size:12px;color:var(--gray-400)">${p.telefono}</div></td>
+          <td class="hide-mobile" style="color:var(--gray-400);font-size:13px">${p.fecha}</td>
+          <td class="mono" style="font-weight:600">€${total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+          <td>${badgeSelect(p)}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <button class="btn sm" onclick="previewDoc('presupuesto','${p.id}')" title="Ver"><i class="ti ti-eye"></i></button>
+              <button class="btn sm" onclick="editPresup('${p.id}')" title="Editar"><i class="ti ti-edit"></i></button>
+              ${p.estado==='aceptado'?`<button class="btn sm success" onclick="convertirFactura('${p.id}')" title="Crear factura"><i class="ti ti-receipt"></i></button>`:''}
+              <button class="btn sm" style="color:var(--red)" onclick="deletePresup('${p.id}')" title="Eliminar"><i class="ti ti-trash"></i></button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+  </div>`;
+}
+
+// ---- FACTURAS ----
+function renderFacturas(c) {
+  c.innerHTML = `
+  <div class="card">
+    <div class="card-header">
+      <div><div class="card-title">Facturas emitidas</div><div class="card-sub">${facturas.length} facturas en total</div></div>
+    </div>
+    ${facturas.length === 0 ? `<div class="empty"><i class="ti ti-receipt-off"></i><p>No hay facturas aún.<br>Convierte un presupuesto aceptado en factura.</p></div>` :
+    `<table>
+      <thead><tr><th>Número</th><th>Cliente</th><th class="hide-mobile">Fecha</th><th>Total (IVA)</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>${facturas.map(f => {
+        const total = f.lines.reduce((a,l) => a + l.qty * l.price, 0) * 1.21;
+        return `<tr>
+          <td class="mono">${f.id}</td>
+          <td style="font-weight:500">${f.cliente}</td>
+          <td class="hide-mobile" style="color:var(--gray-400);font-size:13px">${f.fecha}</td>
+          <td class="mono" style="font-weight:600">€${total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+          <td>${badgeFactSelect(f)}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <button class="btn sm" onclick="previewDoc('factura','${f.id}')" title="Ver"><i class="ti ti-eye"></i></button>
+              <button class="btn sm" onclick="printPDF()" title="Imprimir"><i class="ti ti-printer"></i></button>
+              ${f.estado==='pendiente-pago'?`<button class="btn sm success" onclick="marcarCobrada('${f.id}')"><i class="ti ti-check"></i>Cobrada</button>`:''}
+            </div>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`}
+  </div>`;
+}
+
+// ---- AYUDA ----
+function renderAyuda(c) {
+  c.innerHTML = `
+  <div class="card" style="max-width:600px">
+    <div class="card-header"><div class="card-title">¿Cómo usar PresupIA?</div></div>
+    <div style="padding:24px;display:flex;flex-direction:column;gap:20px">
+      ${[
+        ['1. Crea un presupuesto','Pulsa "+ Nuevo presupuesto", rellena los datos del cliente y añade los conceptos del trabajo.','ti-file-text'],
+        ['2. Envíalo al cliente','Pulsa el icono de ojo para ver la vista previa e imprímelo o guárdalo como PDF.','ti-eye'],
+        ['3. Marca el estado','Cambia el estado a Aceptado, Pendiente o Rechazado según la respuesta del cliente.','ti-check'],
+        ['4. Genera la factura','Si el presupuesto es aceptado, pulsa el botón de recibo verde para convertirlo en factura.','ti-receipt'],
+        ['5. Controla los cobros','En la sección Facturas puedes marcar cuáles están cobradas y cuáles pendientes.','ti-wallet'],
+      ].map(([t,d,ic]) => `
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="width:40px;height:40px;background:var(--orange-light);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--orange)"><i class="ti ${ic}" style="font-size:20px"></i></div>
+          <div><div style="font-weight:600;font-size:14px;margin-bottom:3px">${t}</div><div style="font-size:13px;color:var(--gray-500)">${d}</div></div>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+// ---- BADGES ----
+function badge(estado) {
+  const map = {pendiente:'pendiente',aceptado:'aceptado',rechazado:'rechazado','pendiente-pago':'pendiente-pago',cobrada:'cobrada'};
+  const label = {pendiente:'Pendiente',aceptado:'Aceptado',rechazado:'Rechazado','pendiente-pago':'Pendiente cobro',cobrada:'Cobrada'};
+  return `<span class="badge ${map[estado]||estado}">${label[estado]||estado}</span>`;
+}
+
+function badgeSelect(p) {
+  return `<select class="badge ${p.estado}" onchange="changeEstado('${p.id}',this.value)" style="border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;padding:4px 8px;border-radius:20px">
+    <option value="pendiente" ${p.estado==='pendiente'?'selected':''}>Pendiente</option>
+    <option value="aceptado" ${p.estado==='aceptado'?'selected':''}>Aceptado</option>
+    <option value="rechazado" ${p.estado==='rechazado'?'selected':''}>Rechazado</option>
+  </select>`;
+}
+
+function badgeFactSelect(f) {
+  return `<select class="badge ${f.estado}" onchange="changeEstadoFact('${f.id}',this.value)" style="border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;padding:4px 8px;border-radius:20px">
+    <option value="pendiente-pago" ${f.estado==='pendiente-pago'?'selected':''}>Pendiente cobro</option>
+    <option value="cobrada" ${f.estado==='cobrada'?'selected':''}>Cobrada</option>
+  </select>`;
+}
+
+// ---- MODAL ----
+function openModal(type) {
+  if(type === 'presupuesto') {
+    editingId = null;
+    document.getElementById('modal-presup-title').textContent = 'Nuevo presupuesto';
+    document.getElementById('p-cliente').value = '';
+    document.getElementById('p-telefono').value = '';
+    document.getElementById('p-direccion').value = '';
+    document.getElementById('p-notas').value = '';
+    const d = new Date(); d.setDate(d.getDate()+30);
+    document.getElementById('p-validez').value = d.toISOString().split('T')[0];
+    lineCount = 0;
+    document.getElementById('lines-container').innerHTML = '';
+    addLine(); addLine();
+    calcTotals();
+    document.getElementById('modal-presupuesto').classList.add('open');
+  }
+}
+
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.remove('open');
+}
+
+function addLine() {
+  lineCount++;
+  const id = lineCount;
+  const div = document.createElement('div');
+  div.className = 'line-row';
+  div.id = 'line-' + id;
+  div.innerHTML = `
+    <input type="text" placeholder="Descripción del trabajo" oninput="calcTotals()">
+    <input type="number" placeholder="1" value="1" min="0" oninput="calcTotals()" style="text-align:center">
+    <input type="number" placeholder="0,00" min="0" step="0.01" oninput="calcTotals()" style="text-align:right">
+    <input type="text" id="line-total-${id}" readonly style="text-align:right;background:var(--gray-50);color:var(--gray-500)" placeholder="€0,00">
+    <button class="btn-icon" onclick="removeLine(${id})"><i class="ti ti-trash"></i></button>`;
+  document.getElementById('lines-container').appendChild(div);
+}
+
+function removeLine(id) {
+  const el = document.getElementById('line-' + id);
+  if(el) el.remove();
+  calcTotals();
+}
+
+function calcTotals() {
+  let base = 0;
+  document.querySelectorAll('#lines-container .line-row').forEach((row, i) => {
+    const inputs = row.querySelectorAll('input');
+    const qty = parseFloat(inputs[1].value) || 0;
+    const price = parseFloat(inputs[2].value) || 0;
+    const total = qty * price;
+    base += total;
+    const ti = row.querySelector('[id^="line-total"]');
+    if(ti) ti.value = '€' + total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+  });
+  const iva = base * 0.21;
+  const total = base + iva;
+  document.getElementById('t-base').textContent = '€' + base.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('t-iva').textContent = '€' + iva.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('t-total').textContent = '€' + total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function getLinesFromForm() {
+  const lines = [];
+  document.querySelectorAll('#lines-container .line-row').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const desc = inputs[0].value.trim();
+    const qty = parseFloat(inputs[1].value) || 0;
+    const price = parseFloat(inputs[2].value) || 0;
+    if(desc) lines.push({desc, qty, price});
+  });
+  return lines;
+}
+
+function savePresupuesto() {
+  const cliente = document.getElementById('p-cliente').value.trim();
+  if(!cliente) { showToast('El nombre del cliente es obligatorio', false); return; }
+  const lines = getLinesFromForm();
+  if(lines.length === 0) { showToast('Añade al menos un concepto', false); return; }
+
+  if(editingId) {
+    const p = presupuestos.find(x => x.id === editingId);
+    if(p) { p.cliente = cliente; p.telefono = document.getElementById('p-telefono').value; p.direccion = document.getElementById('p-direccion').value; p.validez = document.getElementById('p-validez').value; p.notas = document.getElementById('p-notas').value; p.lines = lines; }
+  } else {
+    const num = presupuestos.length + 1;
+    const id = 'P-2025-' + String(num + 5).padStart(3,'0');
+    presupuestos.unshift({id, cliente, telefono: document.getElementById('p-telefono').value, direccion: document.getElementById('p-direccion').value, fecha: new Date().toISOString().split('T')[0], validez: document.getElementById('p-validez').value, estado:'pendiente', notas: document.getElementById('p-notas').value, lines});
+  }
+  closeModal('presupuesto');
+  showToast('Presupuesto guardado correctamente');
+  navigate('presupuestos', null);
+  updateBadges();
+}
+
+function editPresup(id) {
+  const p = presupuestos.find(x => x.id === id);
+  if(!p) return;
+  editingId = id;
+  document.getElementById('modal-presup-title').textContent = 'Editar presupuesto';
+  document.getElementById('p-cliente').value = p.cliente;
+  document.getElementById('p-telefono').value = p.telefono;
+  document.getElementById('p-direccion').value = p.direccion;
+  document.getElementById('p-validez').value = p.validez;
+  document.getElementById('p-notas').value = p.notas;
+  lineCount = 0;
+  document.getElementById('lines-container').innerHTML = '';
+  p.lines.forEach(l => {
+    addLine();
+    const row = document.querySelector('#lines-container .line-row:last-child');
+    const inputs = row.querySelectorAll('input');
+    inputs[0].value = l.desc;
+    inputs[1].value = l.qty;
+    inputs[2].value = l.price;
+  });
+  calcTotals();
+  document.getElementById('modal-presupuesto').classList.add('open');
+}
+
+function deletePresup(id) {
+  if(!confirm('¿Eliminar este presupuesto?')) return;
+  presupuestos = presupuestos.filter(p => p.id !== id);
+  showToast('Presupuesto eliminado');
+  navigate('presupuestos', null);
+  updateBadges();
+}
+
+function changeEstado(id, estado) {
+  const p = presupuestos.find(x => x.id === id);
+  if(p) { p.estado = estado; updateBadges(); showToast('Estado actualizado'); }
+  navigate('presupuestos', null);
+}
+
+function changeEstadoFact(id, estado) {
+  const f = facturas.find(x => x.id === id);
+  if(f) { f.estado = estado; updateBadges(); showToast('Estado actualizado'); }
+  navigate('facturas', null);
+}
+
+function convertirFactura(presupId) {
+  const p = presupuestos.find(x => x.id === presupId);
+  if(!p) return;
+  if(facturas.find(f => f.presupId === presupId)) { showToast('Ya existe una factura para este presupuesto', false); return; }
+  const num = facturas.length + 4;
+  facturas.unshift({id:'F-2025-' + String(num).padStart(3,'0'), presupId, cliente: p.cliente, fecha: new Date().toISOString().split('T')[0], estado:'pendiente-pago', lines: p.lines});
+  showToast('Factura creada correctamente');
+  navigate('facturas', null);
+  updateBadges();
+}
+
+function marcarCobrada(id) {
+  const f = facturas.find(x => x.id === id);
+  if(f) { f.estado = 'cobrada'; updateBadges(); showToast('Factura marcada como cobrada'); navigate('facturas', null); }
+}
+
+// ---- PDF PREVIEW ----
+function previewDoc(type, id) {
+  let doc;
+  if(type === 'presupuesto') doc = presupuestos.find(x => x.id === id);
+  else doc = facturas.find(x => x.id === id);
+  if(!doc) return;
+
+  const base = doc.lines.reduce((a,l) => a + l.qty * l.price, 0);
+  const iva = base * 0.21;
+  const total = base + iva;
+  const typeLabel = type === 'presupuesto' ? 'PRESUPUESTO' : 'FACTURA';
+
+  document.getElementById('pdf-content').innerHTML = `
+  <div class="pdf-preview" id="printable">
+    <div class="pdf-header">
+      <div>
+        <div class="pdf-company">PresupIA</div>
+        <div style="font-size:13px;color:var(--gray-400);margin-top:4px">Miguel Alonso Fontanería<br>NIF: 12345678A<br>C/ Taller 3, Madrid<br>Tel: 666 000 111</div>
+      </div>
+      <div>
+        <div class="pdf-type">${typeLabel}</div>
+        <div class="pdf-num">${doc.id}</div>
+        <div style="font-size:12px;color:var(--gray-400);text-align:right;margin-top:4px">Fecha: ${doc.fecha}${type==='presupuesto'?`<br>Válido hasta: ${doc.validez}`:''}</div>
+      </div>
+    </div>
+    <div class="pdf-parties">
+      <div><div class="pdf-label">Emitido por</div><div class="pdf-value">Miguel Alonso<br>Fontanero autónomo</div></div>
+      <div><div class="pdf-label">Cliente</div><div class="pdf-value">${doc.cliente}<br>${doc.direccion||'—'}<br>${doc.telefono||''}</div></div>
+    </div>
+    <table class="pdf-table">
+      <thead><tr><th>Descripción</th><th style="text-align:center">Cant.</th><th style="text-align:right">P. unitario</th><th style="text-align:right">Total</th></tr></thead>
+      <tbody>${doc.lines.map(l => `<tr><td>${l.desc}</td><td style="text-align:center">${l.qty}</td><td style="text-align:right">€${l.price.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td style="text-align:right;font-weight:500">€${(l.qty*l.price).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</td></tr>`).join('')}</tbody>
+    </table>
+    <div class="pdf-totals">
+      <div class="pdf-total-row"><span>Base imponible</span><span>€${base.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+      <div class="pdf-total-row"><span>IVA (21%)</span><span>€${iva.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+      <div class="pdf-total-row main"><span>TOTAL</span><span style="color:var(--orange-dark)">€${total.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</span></div>
+    </div>
+    ${doc.notas?`<div style="margin-top:20px;padding:14px;background:var(--gray-50);border-radius:var(--radius-sm);font-size:13px;color:var(--gray-500)"><strong>Notas:</strong> ${doc.notas}</div>`:''}
+    <div class="pdf-footer">Generado con PresupIA · presupupia.netlify.app</div>
+  </div>`;
+  document.getElementById('modal-pdf').classList.add('open');
+}
+
+function printPDF() {
+  window.print();
+}
+
+// ---- TOAST ----
+function showToast(msg, success = true) {
+  const t = document.getElementById('toast');
+  const m = document.getElementById('toast-msg');
+  m.textContent = msg;
+  t.className = 'toast' + (success ? ' success' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ---- SIDEBAR MOBILE ----
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); }
+
+// ---- INIT ----
+updateBadges();
+renderDashboard(document.getElementById('content'));
+</script>
+</body>
+</html>
